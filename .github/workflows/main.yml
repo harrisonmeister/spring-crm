@@ -76,7 +76,7 @@ jobs:
             artifacts/springcrm.web.${{ steps.version-generator.outputs.version }}.war
             artifacts/springcrm.db.${{ steps.version-generator.outputs.version }}.zip
 
-  Create-Octopus-Release:
+  create-octopus-release:
       name: Create Octopus Release 🐙
       needs: [build]
       runs-on: ubuntu-latest
@@ -94,3 +94,23 @@ jobs:
           git_ref: "refs/heads/main"
       outputs: 
        release_number: ${{ steps.create-release.outputs.release_number }}
+
+  Deploy-Octopus-Release:
+      name: Deploy Octopus Release to Development 🐙
+      needs: [build, create-octopus-release]
+      runs-on: ubuntu-latest
+      
+      env:
+        OCTOPUS_URL: ${{ vars.OCTOPUS_SERVER_URL }}
+        OCTOPUS_API_KEY: ${{ secrets.OCTOPUS_API_KEY }}
+        OCTOPUS_SPACE: ${{ vars.OCTOPUS_SERVER_SPACE }}
+        
+      steps:
+      - uses: OctopusDeploy/deploy-release-action@v3
+        id: "deploy-release"
+        with:
+          project: "Spring CRM"
+          release_number: ${{ needs.create-octopus-release.outputs.release_number }}
+          environments: |
+            Development
+      
