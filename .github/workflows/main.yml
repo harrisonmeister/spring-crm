@@ -85,7 +85,7 @@ jobs:
 
   Deploy-Octopus-Release:
       # Deploy Octopus release
-      name: Deploy Octopus Release to Development 🐙
+      name: Deploy to Development 🐙
       needs: [build, create-octopus-release]
       runs-on: ubuntu-latest
       
