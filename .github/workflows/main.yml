@@ -61,8 +61,8 @@ jobs:
         with:
           package_id: 'springcrm.db'
           version: $PACKAGE_VERSION
-          output_folder: $GITHUB_WORKSPACE/artifacts
-          base_path: $GITHUB_WORKSPACE/flyway
+          output_folder: artifacts
+          base_path: flyway
           files: |
             **/*.*
 
