@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.octopus.samples</groupId>
-  <artifactId>spring-petclinic</artifactId>
+  <artifactId>spring-crm</artifactId>
   <version>${revision}</version>
   <packaging>${packaging}</packaging>
 
@@ -13,7 +13,7 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>2.3.1.RELEASE</version>
   </parent>
-  <name>petclinic.web</name>
+  <name>springcrm.web</name>
 
   <properties>
 
