@@ -6,7 +6,7 @@
 <%@ taglib prefix="petclinic" tagdir="/WEB-INF/tags" %>
 
 <petclinic:layout pageName="owners">
-    <h2>Owners</h2>
+    <h2>Customers</h2>
 
     <table id="ownersTable" class="table table-striped">
         <thead>
@@ -15,7 +15,7 @@
             <th style="width: 200px;">Address</th>
             <th>City</th>
             <th style="width: 120px">Telephone</th>
-            <th>Pets</th>
+            <th>Products</th>
         </tr>
         </thead>
         <tbody>
