@@ -21,7 +21,7 @@
             <thead>
             <tr>
                 <th>Name</th>
-                <th>Birth Date</th>
+                <th>Start Date</th>
                 <th>Type</th>
                 <th>Owner</th>
             </tr>
