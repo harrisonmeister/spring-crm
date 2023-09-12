@@ -48,7 +48,7 @@ jobs:
       # Build Spring CRM using maven
       - name: Build Spring CRM
         run: |
-          mvn clean package -Pwar versions:set -DnewVersion=$PACKAGE_VERSION -Drevision=$PACKAGE_VERSION
+          mvn clean package -Pwar -Dproject.versionNumber=$PACKAGE_VERSION -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
           cp "$GITHUB_WORKSPACE/target/petclinic.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
           
       # Package flyway
