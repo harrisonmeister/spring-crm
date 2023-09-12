@@ -1,0 +1,65 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: "0 07 * * *"    
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      # Set the build version number
+      - name: Set Version
+        run: echo "PACKAGE_VERSION=$(date +'%Y.%m.%d').$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+      
+      # Setup build to use Java
+      - name: Set up JDK11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+          
+      # Install Octopus action
+      - name: Install Octopus CLI
+        uses: OctopusDeploy/install-octopus-cli-action@v1.1.1
+        with:
+          version: latest
+
+      # Create artifacts folder
+      - name: Create artifacts folder
+        run: mkdir "$GITHUB_WORKSPACE/artifacts"
+
+      # Build PetClinic using maven
+      - name: Build PetClinic
+        run: |
+          mvn clean package -Pwar versions:set -DnewVersion=$PACKAGE_VERSION -Drevision=$PACKAGE_VERSION
+          cp "$GITHUB_WORKSPACE/target/petclinic.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/petclinic.web.$PACKAGE_VERSION.war"
+          
+      # Package flyway
+      - name: Package Flyway
+        run: |
+          octo pack --id="petclinic.db" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
+          
+      # Push packages to octopus deploy
+      - name: Push packages to Octopus
+        run: |
+          octo push --package="$GITHUB_WORKSPACE/artifacts/petclinic.web.$PACKAGE_VERSION.war" --server="${{ secrets.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ secrets.OCTOPUS_SERVER_SPACE }}"
+          octo push --package="$GITHUB_WORKSPACE/artifacts/petclinic.db.$PACKAGE_VERSION.zip" --server="${{ secrets.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ secrets.OCTOPUS_SERVER_SPACE }}"      
