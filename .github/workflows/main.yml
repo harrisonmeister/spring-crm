@@ -30,17 +30,11 @@ jobs:
       
       # Setup build to use Java
       - name: Set up JDK11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'adopt'
           
-      # Install Octopus action
-      - name: Install Octopus CLI
-        uses: OctopusDeploy/install-octopus-cli-action@v1.1.1
-        with:
-          version: latest
-
       # Create artifacts folder
       - name: Create artifacts folder
         run: mkdir "$GITHUB_WORKSPACE/artifacts"
@@ -106,7 +100,7 @@ jobs:
         with:
           project: "Spring CRM"
           release_number: ${{ needs.create-octopus-release.outputs.release_number }}
-          environments: |
+          environment: |
             Development
           tenants:
             Internal
