@@ -49,13 +49,23 @@ jobs:
       - name: Build Spring CRM
         run: |
           mvn clean package -Pwar -Dproject.versionNumber=$PACKAGE_VERSION -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
-          cp "$GITHUB_WORKSPACE/target/petclinic.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
+          cp "$GITHUB_WORKSPACE/target/springcrm.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
           
       # Package flyway
-      - name: Package Flyway scripts
-        run: |
-          octo pack --id="springcrm.db" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
+      #- name: Package Flyway scripts
+      #  run: |
+      #    octo pack --id="springcrm.db" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
           
+      - name: Package database scripts
+        uses: OctopusDeploy/create-zip-package-action@v3
+        with:
+          package_id: 'springcrm.db'
+          version: $PACKAGE_VERSION
+          output_folder: $GITHUB_WORKSPACE/artifacts
+          base_path: $GITHUB_WORKSPACE/flyway
+          files: |
+            **/*.*
+
       # Push packages to octopus deploy
       - name: Push packages to Octopus
         run: |

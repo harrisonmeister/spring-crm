@@ -313,7 +313,7 @@
     <!-- Maven plugin versions are mentioned in order to guarantee the build reproducibility in the long term -->
     <build>
         <defaultGoal>install</defaultGoal>
-        <finalName>petclinic.web.${project.version}</finalName>
+        <finalName>springcrm.web.${project.version}</finalName>
         <resources>
             <resource>
                 <directory>${basedir}/src/main/resources</directory>
