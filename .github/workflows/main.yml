@@ -52,13 +52,13 @@ jobs:
       # Build Spring CRM using maven
       - name: Build Spring CRM
         run: |
-          mvn clean package -Pwar -Dproject.versionNumber=$version -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
+          mvn clean package -Pwar -Dproject.versionNumber=${{ steps.version-generator.outputs.version }} -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
           cp "$GITHUB_WORKSPACE/target/springcrm.web.$version.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$version.war"
           
       # Package flyway
       #- name: Package Flyway scripts
       #  run: |
-      #    octo pack --id="springcrm.db" --format="Zip" --version="$version" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
+      #    octo pack --id="springcrm.db" --format="Zip" --version="${{ steps.version-generator.outputs.version }}" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
           
       - name: Package database scripts
         uses: OctopusDeploy/create-zip-package-action@v3
@@ -73,5 +73,5 @@ jobs:
       # Push packages to octopus deploy
       - name: Push packages to Octopus
         run: |
-          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.web.$version.war" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"
-          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.db.$version.zip" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"      
+          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.web.${{ steps.version-generator.outputs.version }}.war" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"
+          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.db.${{ steps.version-generator.outputs.version }}.zip" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"      
