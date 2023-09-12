@@ -86,8 +86,8 @@ jobs:
       
         with:  
           packages: |
-            artifacts/springcrm.web.${{ needs.build.outputs.version }}.war
-            artifacts/springcrm.db.${{ needs.build.outputs.version }}.zip
+            $GITHUB_WORKSPACE/artifacts/springcrm.web.${{ needs.build.outputs.version }}.war
+            $GITHUB_WORKSPACE/artifacts/springcrm.db.${{ needs.build.outputs.version }}.zip
 
   Create-Octopus-Release:
       name: Create Octopus Release 🐙
