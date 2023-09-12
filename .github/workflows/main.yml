@@ -49,7 +49,7 @@ jobs:
       - name: Build Spring CRM
         run: |
           mvn clean package -Pwar versions:set -DnewVersion=$PACKAGE_VERSION -Drevision=$PACKAGE_VERSION
-          cp "$GITHUB_WORKSPACE/target/springcrm.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
+          cp "$GITHUB_WORKSPACE/target/petclinic.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
           
       # Package flyway
       - name: Package Flyway scripts
