@@ -20,13 +20,17 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
+    outputs:
+      version: ${{ steps.version-generator.outputs.version }}
+
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Set the build version number
-      - name: Set Version
-        run: echo "PACKAGE_VERSION=$(date +'%Y.%m.%d').$GITHUB_RUN_NUMBER" >> $GITHUB_ENV
+      - name: Set Version number
+        id: version-generator
+        run: echo "version=$(date +'%Y.%m.%d').$GITHUB_RUN_NUMBER" >> $GITHUB_OUTPUT
       
       # Setup build to use Java
       - name: Set up JDK11
@@ -48,19 +52,19 @@ jobs:
       # Build Spring CRM using maven
       - name: Build Spring CRM
         run: |
-          mvn clean package -Pwar -Dproject.versionNumber=$PACKAGE_VERSION -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
-          cp "$GITHUB_WORKSPACE/target/springcrm.web.$PACKAGE_VERSION.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war"
+          mvn clean package -Pwar -Dproject.versionNumber=$version -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
+          cp "$GITHUB_WORKSPACE/target/springcrm.web.$version.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.$version.war"
           
       # Package flyway
       #- name: Package Flyway scripts
       #  run: |
-      #    octo pack --id="springcrm.db" --format="Zip" --version="$PACKAGE_VERSION" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
+      #    octo pack --id="springcrm.db" --format="Zip" --version="$version" --basePath="$GITHUB_WORKSPACE/flyway" --outFolder="$GITHUB_WORKSPACE/artifacts"
           
       - name: Package database scripts
         uses: OctopusDeploy/create-zip-package-action@v3
         with:
           package_id: 'springcrm.db'
-          version: $PACKAGE_VERSION
+          version: ${{ steps.version-generator.outputs.version }}
           output_folder: artifacts
           base_path: flyway
           files: |
@@ -69,5 +73,5 @@ jobs:
       # Push packages to octopus deploy
       - name: Push packages to Octopus
         run: |
-          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.web.$PACKAGE_VERSION.war" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"
-          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.db.$PACKAGE_VERSION.zip" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"      
+          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.web.$version.war" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"
+          octo push --package="$GITHUB_WORKSPACE/artifacts/springcrm.db.$version.zip" --server="${{ vars.OCTOPUS_SERVER_URL }}" --apiKey="${{ secrets.OCTOPUS_API_KEY }}" --space="${{ vars.OCTOPUS_SERVER_SPACE }}"      
