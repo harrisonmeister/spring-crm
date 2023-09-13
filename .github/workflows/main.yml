@@ -30,7 +30,7 @@ jobs:
       
       # Setup build to use Java
       - name: Set up JDK11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
           java-version: '11'
           distribution: 'adopt'
@@ -42,7 +42,7 @@ jobs:
       # Build Spring CRM using maven
       - name: Build Spring CRM
         run: |
-          mvn clean package -Dproject.versionNumber=${{ steps.version-generator.outputs.version }} -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
+          mvn clean package -Pwar -Dproject.versionNumber=${{ steps.version-generator.outputs.version }} -DdatabaseServerName=${{ vars.DATABASE_SERVER_NAME }} -DdatabaseName=${{ vars.DATABASE_NAME }} -DskipTests -DdatabaseUserName=${{ vars.DATABASE_USER_NAME }} -DdatabaseUserPassword=${{ vars.DATABASE_USER_PASSWORD }}
           cp "$GITHUB_WORKSPACE/target/springcrm.web.${{ steps.version-generator.outputs.version }}.war" "$GITHUB_WORKSPACE/artifacts/springcrm.web.${{ steps.version-generator.outputs.version }}.war"
  
       # Packagge Spring CRM DB scripts
